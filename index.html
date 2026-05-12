@@ -5,119 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kasir Bakso Pak Sidiq</title>
     <style>
-        :root {
-            --primary: #2c3e50; --accent: #e67e22; --bg: #f0f3f5;
-            --white: #ffffff; --text: #333; --green: #27ae60; --red: #c0392b;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--text); -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 500px; margin: auto; padding-bottom: 120px; }
-        
-        .header { text-align: center; padding: 15px 0; background: var(--white); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .header h2 { margin: 0; color: var(--primary); letter-spacing: 1px; }
-        
-        .menu-card { background: var(--white); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-left: 6px solid var(--accent); }
-        .info { flex: 1; }
-        .n { font-weight: 800; font-size: 1.1em; display: block; margin-bottom: 4px; }
-        .p { color: #888; font-size: 0.9em; font-weight: 600; }
-
-        .ctrl { display: flex; align-items: center; gap: 15px; }
-        .btn { width: 45px; height: 45px; border-radius: 12px; border: none; font-size: 1.5em; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
-        .btn:active { transform: scale(0.9); }
-        .m { background: #fee2e2; color: var(--red); }
-        .p-plus { background: #dcfce7; color: var(--green); }
-        .v { font-size: 1.4em; font-weight: 800; min-width: 30px; text-align: center; }
-
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary); padding: 20px; border-radius: 20px 20px 0 0; color: white; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); }
-        .sum { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .total-u { font-size: 1.6em; font-weight: 800; color: var(--accent); }
-        .save-btn { width: 100%; padding: 18px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 1.2em; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        :root { --primary: #2c3e50; --accent: #e67e22; --bg: #f0f3f5; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .header { text-align: center; padding: 15px; background: var(--white); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .menu-card { background: var(--white); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--accent); }
+        .btn { width: 40px; height: 40px; border-radius: 10px; border: none; font-size: 1.2em; font-weight: bold; cursor: pointer; }
+        .btn-m { background: #fee2e2; color: #c0392b; }
+        .btn-p { background: #dcfce7; color: #27ae60; }
+        .qty { font-size: 1.2em; font-weight: bold; min-width: 30px; text-align: center; }
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary); padding: 15px; color: white; text-align: center; }
+        .save-btn { width: 90%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h2>BAKSO PAK SIDIQ</h2>
-        <small id="date-now" style="color: #999; font-weight: bold;"></small>
-    </div>
+<div class="header">
+    <h2 style="margin:0; color:var(--primary);">BAKSO PAK SIDIQ</h2>
+</div>
 
-    <div id="list-menu"></div>
+<div id="daftar-menu" style="padding-bottom: 100px;">
+    <!-- Menu muncul otomatis di sini -->
 </div>
 
 <div class="bottom-bar">
-    <div class="sum">
-        <span>Total: <b id="total-p">0</b> Porsi</span>
-        <span class="total-u" id="total-u">Rp 0</span>
-    </div>
-    <button class="save-btn" onclick="kirimData()">SIMPAN PENJUALAN</button>
+    <div style="margin-bottom:10px; font-size: 1.2em;">Total: <span id="display-total" style="color:var(--accent); font-weight:bold;">Rp 0</span></div>
+    <button class="save-btn" onclick="prosesSimpan()">SIMPAN PENJUALAN</button>
 </div>
 
 <script>
-    const menuMaster = [
-        { n: "Bakso Urat", h: 11000 }, { n: "Bakso Halus", h: 12000 },
-        { n: "Bakso Mercon", h: 15000 }, { n: "Bakso Urat Jumbo", h: 15000 },
-        { n: "Bakso Urat Super Jumbo", h: 20000 }, { n: "Bakso Tetelan", h: 20000 },
-        { n: "Bakso Balungan", h: 20000 }, { n: "Bakso Iga", h: 25000 },
-        { n: "Mie Ayam", h: 9000 }, { n: "Mie Ayam Bakso", h: 14000 },
-        { n: "Mie Ayam Bakso Jumbo", h: 18000 }
+    // MASUKKAN LINK APPS SCRIPT BAPAK DI SINI
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyI76Hh7v3S34O8jZ2W47yPj8Q-2R4iX0G0-b6S/exec";
+
+    const daftarBakso = [
+        { nama: "Bakso Urat", harga: 11000 },
+        { nama: "Bakso Halus", harga: 12000 },
+        { nama: "Bakso Mercon", harga: 15000 },
+        { nama: "Bakso Urat Jumbo", harga: 15000 },
+        { nama: "Bakso Urat Super Jumbo", harga: 20000 },
+        { nama: "Bakso Tetelan", harga: 20000 },
+        { nama: "Bakso Balungan", harga: 20000 },
+        { nama: "Bakso Iga", harga: 25000 },
+        { nama: "Mie Ayam", harga: 9000 },
+        { nama: "Mie Ayam Bakso", harga: 14000 },
+        { nama: "Mie Ayam Bakso Jumbo", harga: 18000 }
     ];
 
-    let sales = {};
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt2jLWruQbi0xo8Fl8pjDJR3-G4d59Fi7CCrqVNQH1xwQFQgg-FZ5SYfqm3wBWH4yk2g/exec"; // Tempel URL Deployment Bapak di sini
+    let keranjang = {};
 
-    function init() {
-        document.getElementById('date-now').innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long'});
-        const container = document.getElementById('list-menu');
-        container.innerHTML = menuMaster.map((m, i) => {
-            sales[i] = 0;
+    function tampilkanMenu() {
+        const wadah = document.getElementById('daftar-menu');
+        wadah.innerHTML = daftarBakso.map((item, i) => {
+            keranjang[i] = 0;
             return `
-            <div class="menu-card">
-                <div class="info">
-                    <span class="n">${m.n}</span>
-                    <span class="p">Rp ${m.h.toLocaleString()}</span>
-                </div>
-                <div class="ctrl">
-                    <button class="btn m" onclick="upd(${i},-1)">-</button>
-                    <span class="v" id="v-${i}">0</span>
-                    <button class="btn p-plus" onclick="upd(${i},1)">+</button>
-                </div>
-            </div>`;
+                <div class="menu-card">
+                    <div><b>${item.nama}</b><br><small>Rp ${item.harga.toLocaleString()}</small></div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button class="btn btn-m" onclick="tambahKurang(${i}, -1)">-</button>
+                        <span class="qty" id="qty-${i}">0</span>
+                        <button class="btn btn-p" onclick="tambahKurang(${i}, 1)">+</button>
+                    </div>
+                </div>`;
         }).join('');
     }
 
-    function upd(i, d) {
-        if (sales[i] + d >= 0) {
-            sales[i] += d;
-            document.getElementById(v-${i}).innerText = sales[i];
-            calc();
+    function tambahKurang(id, jumlah) {
+        if(keranjang[id] + jumlah >= 0) {
+            keranjang[id] += jumlah;
+            document.getElementById(qty-${id}).innerText = keranjang[id];
+            hitungTotal();
         }
     }
 
-    function calc() {
-        let tp = 0, tu = 0;
-        menuMaster.forEach((m, i) => {
-            tp += sales[i];
-            tu += (sales[i] * m.h);
-        });
-        document.getElementById('total-p').innerText = tp;
-        document.getElementById('total-u').innerText = "Rp " + tu.toLocaleString('id-ID');
+    function hitungTotal() {
+        let total = 0;
+        daftarBakso.forEach((item, i) => { total += (keranjang[i] * item.harga); });
+        document.getElementById('display-total').innerText = "Rp " + total.toLocaleString('id-ID');
     }
 
-    async function kirimData() {
-        const total = document.getElementById('total-u').innerText;
-        if(confirm("Simpan total " + total + "?")) {
-            const data = { items: menuMaster.map((m, i) => ({ nama: m.n, harga: m.h, qty: sales[i] })) };
-            
-            try {
-                const res = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("MANTAP! Data sudah masuk Sheets.");
-                location.reload(); // Reset halaman
-            } catch (e) {
-                alert("Gagal! Cek sinyal internet Pak.");
-            }
-        }
+    async function prosesSimpan() {
+        const payload = { items: daftarBakso.map((item, i) => ({ nama: item.nama, harga: item.harga, qty: keranjang[i] })) };
+        if(Object.values(keranjang).every(v => v === 0)) return alert("Pilih menu dulu, Pak!");
+        
+        try {
+            alert("Sedang mengirim... Mohon tunggu.");
+            await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            alert("Berhasil! Data sudah masuk ke Sheets.");
+            location.reload();
+        } catch (e) { alert("Gagal kirim! Cek koneksi atau link script."); }
     }
-    init();
+
+    tampilkanMenu();
 </script>
 </body>
 </html>
