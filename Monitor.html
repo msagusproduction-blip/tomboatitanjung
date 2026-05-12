@@ -2,27 +2,122 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Bakso Pak Sidiq</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kasir Bakso Pak Sidiq</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f3f5; margin: 0; padding: 15px; }
-        .header { background: #2c3e50; color: white; text-align: center; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
-        .card { background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .uang { font-size: 2.5rem; font-weight: bold; color: #27ae60; margin: 10px 0; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
-        th { background: #ecf0f1; padding: 12px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
+        :root {
+            --primary: #2c3e50; --accent: #e67e22; --bg: #f0f3f5;
+            --white: #ffffff; --text: #333; --green: #27ae60; --red: #c0392b;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--text); -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 500px; margin: auto; padding-bottom: 120px; }
+        
+        .header { text-align: center; padding: 15px 0; background: var(--white); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header h2 { margin: 0; color: var(--primary); letter-spacing: 1px; }
+        
+        .menu-card { background: var(--white); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-left: 6px solid var(--accent); }
+        .info { flex: 1; }
+        .n { font-weight: 800; font-size: 1.1em; display: block; margin-bottom: 4px; }
+        .p { color: #888; font-size: 0.9em; font-weight: 600; }
+
+        .ctrl { display: flex; align-items: center; gap: 15px; }
+        .btn { width: 45px; height: 45px; border-radius: 12px; border: none; font-size: 1.5em; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
+        .btn:active { transform: scale(0.9); }
+        .m { background: #fee2e2; color: var(--red); }
+        .p-plus { background: #dcfce7; color: var(--green); }
+        .v { font-size: 1.4em; font-weight: 800; min-width: 30px; text-align: center; }
+
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary); padding: 20px; border-radius: 20px 20px 0 0; color: white; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); }
+        .sum { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .total-u { font-size: 1.6em; font-weight: 800; color: var(--accent); }
+        .save-btn { width: 100%; padding: 18px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 1.2em; font-weight: 800; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <div class="header"><h2 style="margin:0">MONITOR PENJUALAN</h2><small>Bakso Pak Sidiq</small></div>
-    <div class="card"><div style="color:#7f8c8d">TOTAL PENDAPATAN HARI INI</div><div class="uang">Rp 0</div></div>
-    <div class="card" style="text-align:left;">
-        <h3 style="margin-top:0">Rincian Terjual</h3>
-        <table>
-            <tr><th>Menu</th><th>Qty</th><th>Total</th></tr>
-            <tr><td colspan="3" style="color:#999; padding:20px;">Menunggu data...</td></tr>
-        </table>
+
+<div class="container">
+    <div class="header">
+        <h2>BAKSO PAK SIDIQ</h2>
+        <small id="date-now" style="color: #999; font-weight: bold;"></small>
     </div>
+
+    <div id="list-menu"></div>
+</div>
+
+<div class="bottom-bar">
+    <div class="sum">
+        <span>Total: <b id="total-p">0</b> Porsi</span>
+        <span class="total-u" id="total-u">Rp 0</span>
+    </div>
+    <button class="save-btn" onclick="kirimData()">SIMPAN PENJUALAN</button>
+</div>
+
+<script>
+    const menuMaster = [
+        { n: "Bakso Urat", h: 11000 }, { n: "Bakso Halus", h: 12000 },
+        { n: "Bakso Mercon", h: 15000 }, { n: "Bakso Urat Jumbo", h: 15000 },
+        { n: "Bakso Urat Super Jumbo", h: 20000 }, { n: "Bakso Tetelan", h: 20000 },
+        { n: "Bakso Balungan", h: 20000 }, { n: "Bakso Iga", h: 25000 },
+        { n: "Mie Ayam", h: 9000 }, { n: "Mie Ayam Bakso", h: 14000 },
+        { n: "Mie Ayam Bakso Jumbo", h: 18000 }
+    ];
+
+    let sales = {};
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt2jLWruQbi0xo8Fl8pjDJR3-G4d59Fi7CCrqVNQH1xwQFQgg-FZ5SYfqm3wBWH4yk2g/exec"; // Tempel URL Deployment Bapak di sini
+
+    function init() {
+        document.getElementById('date-now').innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long'});
+        const container = document.getElementById('list-menu');
+        container.innerHTML = menuMaster.map((m, i) => {
+            sales[i] = 0;
+            return `
+            <div class="menu-card">
+                <div class="info">
+                    <span class="n">${m.n}</span>
+                    <span class="p">Rp ${m.h.toLocaleString()}</span>
+                </div>
+                <div class="ctrl">
+                    <button class="btn m" onclick="upd(${i},-1)">-</button>
+                    <span class="v" id="v-${i}">0</span>
+                    <button class="btn p-plus" onclick="upd(${i},1)">+</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function upd(i, d) {
+        if (sales[i] + d >= 0) {
+            sales[i] += d;
+            document.getElementById(v-${i}).innerText = sales[i];
+            calc();
+        }
+    }
+
+    function calc() {
+        let tp = 0, tu = 0;
+        menuMaster.forEach((m, i) => {
+            tp += sales[i];
+            tu += (sales[i] * m.h);
+        });
+        document.getElementById('total-p').innerText = tp;
+        document.getElementById('total-u').innerText = "Rp " + tu.toLocaleString('id-ID');
+    }
+
+    async function kirimData() {
+        const total = document.getElementById('total-u').innerText;
+        if(confirm("Simpan total " + total + "?")) {
+            const data = { items: menuMaster.map((m, i) => ({ nama: m.n, harga: m.h, qty: sales[i] })) };
+            
+            try {
+                const res = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(data) });
+                alert("MANTAP! Data sudah masuk Sheets.");
+                location.reload(); // Reset halaman
+            } catch (e) {
+                alert("Gagal! Cek sinyal internet Pak.");
+            }
+        }
+    }
+    init();
+</script>
 </body>
 </html>
