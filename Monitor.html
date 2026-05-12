@@ -7,51 +7,22 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f3f5; margin: 0; padding: 15px; }
         .header { background: #2c3e50; color: white; text-align: center; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
-        .card-utama { background: white; border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 6px solid #27ae60; }
+        .card { background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .uang { font-size: 2.5rem; font-weight: bold; color: #27ae60; margin: 10px 0; }
-        .btn-hari { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 10px; background: #34495e; color: white; font-weight: bold; cursor: pointer; }
-        table { width: 100%; background: white; border-radius: 12px; overflow: hidden; border-collapse: collapse; }
-        th { background: #ecf0f1; padding: 12px; font-size: 0.9em; color: #7f8c8d; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
+        th { background: #ecf0f1; padding: 12px; }
         td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
-        .label { color: #7f8c8d; text-transform: uppercase; font-size: 0.8em; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h2 style="margin:0">MONITOR PENJUALAN</h2>
-        <small>Bakso Pak Sidiq</small>
-    </div>
-
-    <div class="btn-hari">
-        <button onclick="alert('Fitur tanggal akan aktif setelah konek Sheets')">❮ Kemarin</button>
-        <div style="align-self:center; font-weight:bold; color:#2c3e50">Hari Ini</div>
-        <button onclick="alert('Fitur tanggal akan aktif setelah konek Sheets')">Besok ❯</button>
-    </div>
-
-    <div class="card-utama">
-        <div class="label">Total Uang Masuk</div>
-        <div class="uang">Rp 0</div>
-    </div>
-
-    <div style="background:white; border-radius:15px; padding:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-        <h3 style="margin-top:0; color:#2c3e50">Detail Jualan</h3>
+    <div class="header"><h2 style="margin:0">MONITOR PENJUALAN</h2><small>Bakso Pak Sidiq</small></div>
+    <div class="card"><div style="color:#7f8c8d">TOTAL PENDAPATAN HARI INI</div><div class="uang">Rp 0</div></div>
+    <div class="card" style="text-align:left;">
+        <h3 style="margin-top:0">Rincian Terjual</h3>
         <table>
-            <thead>
-                <tr>
-                    <th>Menu</th>
-                    <th>Terjual</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="3" style="padding:30px; color:#999;">Belum ada data masuk dari kasir...</td>
-                </tr>
-            </tbody>
+            <tr><th>Menu</th><th>Qty</th><th>Total</th></tr>
+            <tr><td colspan="3" style="color:#999; padding:20px;">Menunggu data...</td></tr>
         </table>
     </div>
-
 </body>
 </html>
